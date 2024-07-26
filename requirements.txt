@@ -1,5 +1,21 @@
-Flask==2.0.2
-Flask-PyMongo==2.3.0
-pandas==1.3.3
-plotly==5.3.1
+Flask==2.2.2
+Flask-Cors==3.0.10
+Flask-Login==0.6.2
+Flask-Migrate==3.1.0
+Flask-SQLAlchemy==2.5.1
+Jinja2==3.1.2
+MarkupSafe==2.1.1
+SQLAlchemy==1.4.44
+click==8.1.3
+itsdangerous==2.1.2
+requests==2.28.1
+Werkzeug==2.2.2
 gunicorn==20.1.0
+psycopg2-binary==2.9.3
+cryptography==37.0.4
+pyjwt==2.4.0
+numpy==1.23.3
+
+# Additional packages
+wheel==0.37.1
+setuptools==58.1.0
