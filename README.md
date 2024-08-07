@@ -2,7 +2,8 @@
 
 This project is an Expense Tracker application built using Flask, MongoDB, and Plotly for data visualization. The application allows users to register, log in, add expenses, categorize them, and view various visual representations of their spending habits.
 
-![image](https://github.com/user-attachments/assets/5c1ba215-a7b1-4657-822e-1731983053a5)
+![image](https://github.com/user-attachments/assets/8d2f78a3-a84b-4c54-ad7d-0fa3473b101f)
+
 
 
 # Live Here:
