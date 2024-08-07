@@ -16,6 +16,11 @@ cryptography==37.0.4
 pyjwt==2.4.0
 numpy==1.23.3
 
+# Additional packages for MongoDB and data visualization
+Flask-PyMongo==2.5.1
+pandas==2.0.3
+plotly==5.13.1
+
 # Additional packages
 wheel==0.37.1
 setuptools==58.1.0

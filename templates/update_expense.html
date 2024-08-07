@@ -4,46 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Expense</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-        input:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
-        }
-        button:focus {
+        input:focus, button:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+        }
+        button {
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        button:hover {
+            background-color: #2563eb;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-    <div class="container mx-auto p-6">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto sm:max-w-lg lg:max-w-2xl">
-            <h1 class="text-3xl font-bold mb-6 text-center text-blue-500">Update Expense</h1>
-            <form method="post" class="space-y-6">
-                
+<body class="flex flex-col min-h-screen bg-gray-100 text-gray-800">
+    <!-- Header -->
+    <header class="bg-blue-900 text-white py-6 shadow-md">
+        <div class="container mx-auto flex justify-center items-center">
+            <h1 class="text-3xl font-bold">Expense Tracker</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center py-12 px-6">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Update Expense</h2>
+            <form method="post" class="space-y-4">
+                <!-- Hidden input to store the expense ID -->
+                <input type="hidden" name="expense_id" value="{{ expense._id }}">
+
                 <div>
-                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
-                    <input type="number" step="0.01" name="amount" id="amount" value="{{ expense.amount }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200">
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount:</label>
+                    <input type="number" step="0.01" name="amount" id="amount" value="{{ expense.amount }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 </div>
                 <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
-                    <input type="text" name="category" id="category" value="{{ expense.category }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200">
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category:</label>
+                    <input type="text" name="category" id="category" value="{{ expense.category }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 </div>
                 <div>
-                    <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-                    <input type="date" name="date" id="date" value="{{ expense.date }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200">
+                    <label for="date" class="block text-sm font-medium text-gray-700">Date:</label>
+                    <input type="date" name="date" id="date" value="{{ expense.date }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 </div>
-                <div class="flex justify-between items-center mt-4">
-                    <a href="{{ url_for('dashboard') }}" class="text-blue-500 hover:text-blue-700 transition duration-200">Back to Dashboard</a>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:ring focus:ring-blue-200 transition duration-200">Update Expense</button>
+                <div class="flex flex-col-reverse sm:flex-row justify-between items-center mt-6">
+                    <a href="{{ url_for('dashboard') }}" class="text-blue-600 hover:text-blue-700 transition duration-300">Back to Dashboard</a>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300">Update Expense</button>
                 </div>
             </form>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="text-sm">&copy; 2024 Expense Tracker. All rights reserved. Developed by Durga Prasad Kakileti.</p>
+        </div>
+    </footer>
 </body>
 </html>

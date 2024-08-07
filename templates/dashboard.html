@@ -4,51 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <meta name="description" content="Developed By Durga Prasad Kakileti">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-    </style>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link rel="icon" href="{{ url_for('static', filename='bannu.png') }}" type="image/x-icon">
+    
+    
+    
 </head>
 <body class="bg-gray-100 text-gray-800">
-    <div class="container mx-auto p-6">
+    <div id="spinner" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        {% include 'spinner.html' %}
+    </div>
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
         <header class="mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-4xl font-bold text-center">Dashboard</h1>
-                <div>
-                    <a href="{{ url_for('index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition duration-300">Return to Home</a>
+            <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                <h1 class="text-3xl md:text-4xl font-bold text-center text-white animate__animated animate__pulse">User Dashboard</h1>
+                <div class="mt-4 md:mt-0">
+                    <a href="{{ url_for('index') }}" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300">Log Out</a>
                 </div>
             </div>
-            <div class="flex justify-center mb-4">
+            <!-- <div class="flex justify-center mb-4">
                 <a href="{{ url_for('add_expense') }}" class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-300">Add Expense</a>
-            </div>
+            </div> -->
         </header>
-        <div class="bg-white p-4 rounded-lg shadow-lg mt-8 mb-8">
+
+        <!-- Expenses Table -->
+        <div class="bg-white p-4 rounded-lg shadow-lg mt-8 mb-8 ">
             <h2 class="text-xl font-semibold mb-4">Your Expenses</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th> -->
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         {% for expense in expenses %}
                         <tr>
-                            <!-- <td class="px-6 py-4 whitespace-nowrap">{{ expense.name }}</td> -->
-                            <td class="px-6 py-4 whitespace-nowrap">{{ expense.amount }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ expense.category }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ expense.date.strftime('%Y-%m-%d') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                                <a href="{{ url_for('update_expense', expense_id=expense._id) }}" class="text-blue-500 hover:text-blue-700">Edit</a>
+                            <td class="px-4 py-4 whitespace-nowrap">{{ expense.amount }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">{{ expense.category }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">{{ expense.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap flex space-x-2 md:space-x-4">
+                                <a href="{{ url_for('update_expense', expense_id=expense._id) }}" class="text-blue-500 hover:text-blue-700 text-sm md:text-base">Edit</a>
                                 <form action="{{ url_for('delete_expense', expense_id=expense._id) }}" method="POST" class="inline">
-                                    <button type="submit" class="text-red-500 hover:text-red-700">Delete</button>
+                                    <button type="submit" class="text-red-500 hover:text-red-700 text-sm md:text-base">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -57,39 +62,49 @@
                 </table>
             </div>
         </div>
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Add Expense Button -->
+        <div class="flex justify-center mb-8">
+            <a href="{{ url_for('add_expense') }}" class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 animate__animated animate__heartBeat animation-delay-4">Add Expense
+                
+            </a>
+        </div>
+
+        <!-- Visualizations -->
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 " data-aos="fade-up"
+        >
             <!-- Existing Visualizations -->
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Pie Chart - Expenses by Category</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ pie_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Bar Chart - Expenses Over Time</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ bar_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Line Chart - Expenses Trend Over Time</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ line_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Histogram - Distribution of Expense Amounts</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ histogram|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Scatter Plot - Expenses by Category Over Time</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ scatter_plot|safe }}
                 </div>
             </div>
@@ -97,49 +112,55 @@
             <!-- New Visualizations -->
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Area Chart - Cumulative Expenses Over Time</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ area_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Donut Chart - Expenses Breakdown</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ donut_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Treemap - Expenses by Category Hierarchy</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ treemap|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Bubble Chart - Expenses by Category and Amount</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ bubble_chart|safe }}
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4">Waterfall Chart - Expenses Flow</h2>
-                <div class="relative">
+                <div class="relative w-full">
                     {{ waterfall_chart|safe }}
                 </div>
             </div>
         </main>
 
-        
-
-        <footer class="bg-gray-800 text-white py-4 mt-auto">
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-4 mt-8">
             <div class="container mx-auto text-center">
                 <p class="text-sm">&copy; 2024 Expense Tracker. All rights reserved. Developed by Durga Prasad Kakileti.</p>
             </div>
         </footer>
-        
-       
     </div>
+
+    <script>
+        AOS.init();
+
+        window.addEventListener('load', function () {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('content').classList.remove('hidden');
+        });
+    </script>
 </body>
 </html>

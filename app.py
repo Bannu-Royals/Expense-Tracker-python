@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import pandas as pd
 from datetime import datetime
-from bson.objectid import ObjectId  # Import ObjectId for MongoDB
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -24,12 +24,19 @@ def register():
         email = request.form['email']
         password = request.form['password']
         if mongo.db is not None:
-            mongo.db.users.insert_one({"username": username, "email": email, "password": password})
+            mongo.db.users.insert_one({
+                "username": username,
+                "email": email,
+                "password": password,
+                "categories": {}  # Initialize empty categories
+            })
         return redirect(url_for('login'))
     return render_template('register.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -37,7 +44,10 @@ def login():
         if user and user['password'] == password:
             session['user_id'] = str(user['_id'])
             return redirect(url_for('dashboard'))
-    return render_template('login.html')
+        else:
+            error = 'Invalid email or password'
+    return render_template('login.html', error=error)
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -45,7 +55,18 @@ def dashboard():
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    expenses = list(mongo.db.expenses.find({"user_id": user_id}))
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+
+    if not user or 'categories' not in user:
+        return render_template('dashboard.html', expenses=[], pie_chart="", bar_chart="", line_chart="", histogram="", scatter_plot="", area_chart="", donut_chart="", treemap="", bubble_chart="", waterfall_chart="")
+
+    expenses = []
+    for category_id, category_details in user['categories'].items():
+        category_name = category_details['name']
+        for expense in category_details.get('expenses', []):
+            expense['category'] = category_name
+            expense['date'] = datetime.strptime(expense['date'], '%Y-%m-%d')
+            expenses.append(expense)
 
     df = pd.DataFrame(expenses)
 
@@ -120,56 +141,105 @@ def dashboard():
 
 @app.route('/add_expense', methods=['GET', 'POST'])
 def add_expense():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         user_id = session['user_id']
         amount = float(request.form['amount'])
-        category = request.form['category']
+        category_name = request.form['category']
         date = request.form['date']
-        mongo.db.expenses.insert_one({
-            "user_id": user_id,
+
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+
+        if not user:
+            return abort(404, description="User not found")
+
+        # Generate or find category ID
+        category_id = None
+        for cat_id, cat_details in user['categories'].items():
+            if cat_details['name'] == category_name:
+                category_id = cat_id
+                break
+        
+        if category_id is None:
+            # Generate a new ObjectId for the category
+            category_id = str(ObjectId())
+            user['categories'][category_id] = {"name": category_name, "expenses": []}
+
+        expense_id = str(ObjectId())
+        user['categories'][category_id]['expenses'].append({
+            "_id": expense_id,
             "amount": amount,
-            "category": category,
-            "date": datetime.strptime(date, '%Y-%m-%d')
+            "date": date
         })
+
+        mongo.db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"categories": user['categories']}})
+
         return redirect(url_for('dashboard'))
     return render_template('add_expense.html')
+
 
 @app.route('/update_expense/<expense_id>', methods=['GET', 'POST'])
 def update_expense(expense_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user_id = session['user_id']
     
-    try:
-        expense_id = ObjectId(expense_id)  # Convert string to ObjectId
-    except Exception as e:
-        print(f"Error converting expense_id: {e}")
-        return abort(404, description="Invalid Expense ID")
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
 
-    expense = mongo.db.expenses.find_one({"_id": expense_id, "user_id": user_id})
+    if not user or 'categories' not in user:
+        return abort(404, description="Expenses not found")
 
-    if expense is None:
+    expense_to_update = None
+    old_category_id = None
+    for category_id, category_details in user['categories'].items():
+        for expense in category_details.get('expenses', []):
+            if expense.get('_id') == expense_id:
+                expense_to_update = expense
+                old_category_id = category_id
+                break
+        if expense_to_update:
+            break
+
+    if expense_to_update is None:
         return abort(404, description="Expense not found")
 
     if request.method == 'POST':
         amount = float(request.form['amount'])
-        category = request.form['category']
+        category_name = request.form['category']
         date = request.form['date']
-        mongo.db.expenses.update_one({"_id": expense_id}, {
-            "$set": {
-                "amount": amount,
-                "category": category,
-                "date": datetime.strptime(date, '%Y-%m-%d')
-            }
-        })
+
+        # Find or create new category ID
+        new_category_id = None
+        for cat_id, cat_details in user['categories'].items():
+            if cat_details['name'] == category_name:
+                new_category_id = cat_id
+                break
+        
+        if new_category_id is None:
+            new_category_id = str(ObjectId())
+            user['categories'][new_category_id] = {"name": category_name, "expenses": []}
+
+        # Update the expense
+        expense_to_update['amount'] = amount
+        expense_to_update['date'] = date
+
+        # Move expense to the new category if changed
+        if old_category_id != new_category_id:
+            user['categories'][old_category_id]['expenses'] = [exp for exp in user['categories'][old_category_id]['expenses'] if exp.get('_id') != expense_id]
+            user['categories'][new_category_id]['expenses'].append(expense_to_update)
+
+        # Remove old category if empty
+        if not user['categories'].get(old_category_id, {}).get('expenses'):
+            del user['categories'][old_category_id]
+
+        # Update the user document with the modified expenses
+        mongo.db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"categories": user['categories']}})
         return redirect(url_for('dashboard'))
-    
-    # Ensure the date is a datetime object
-    expense['date'] = expense['date'].strftime('%Y-%m-%d') if isinstance(expense['date'], datetime) else expense['date']
 
-    return render_template('update_expense.html', expense=expense)
-
+    return render_template('update_expense.html', expense=expense_to_update)
 
 @app.route('/delete_expense/<expense_id>', methods=['POST'])
 def delete_expense(expense_id):
@@ -178,15 +248,34 @@ def delete_expense(expense_id):
 
     user_id = session['user_id']
     
-    try:
-        expense_id = ObjectId(expense_id)  # Convert string to ObjectId
-    except Exception as e:
-        print(f"Error converting expense_id: {e}")
-        return abort(404, description="Invalid Expense ID")
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
 
-    result = mongo.db.expenses.delete_one({"_id": expense_id, "user_id": user_id})
-    if result.deleted_count == 0:
+    if not user or 'categories' not in user:
+        return abort(404, description="Expenses not found")
+
+    expense_to_delete = None
+    old_category_id = None
+    for category_id, category_details in user['categories'].items():
+        for expense in category_details.get('expenses', []):
+            if expense.get('_id') == expense_id:
+                expense_to_delete = expense
+                old_category_id = category_id
+                break
+        if expense_to_delete:
+            break
+
+    if expense_to_delete is None:
         return abort(404, description="Expense not found")
+
+    # Remove the expense from the category
+    user['categories'][old_category_id]['expenses'] = [exp for exp in user['categories'][old_category_id]['expenses'] if exp.get('_id') != expense_id]
+
+    # Remove old category if empty
+    if not user['categories'].get(old_category_id, {}).get('expenses'):
+        del user['categories'][old_category_id]
+
+    # Update the user document with the modified expenses
+    mongo.db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"categories": user['categories']}})
     
     return redirect(url_for('dashboard'))
 

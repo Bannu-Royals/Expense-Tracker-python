@@ -4,49 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-        }
-    </style>
+    <link rel="icon" href="{{ url_for('static', filename='bannu.png') }}" type="image/x-icon">
 </head>
 <body class="flex flex-col min-h-screen bg-gray-50 text-gray-900">
     <!-- Header -->
-    <header class="bg-blue-900 text-white py-6 shadow-lg">
+    <header class="bg-blue-900 text-white py-6 shadow-md rounded-b-lg">
         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-6">
-            <div class="text-3xl font-extrabold">Expense Tracker</div>
+            <div class="text-xl lg:text-2xl font-bold animate__animated animate__zoomInDown">Ｅｘｐｅｎｓｅ Ｔｒａｃｋｅｒ</div>
             <nav class="mt-4 md:mt-0">
-                <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+                <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 hidden md:flex">
                     <li>
-                        <a href="{{ url_for('register') }}" class="text-white hover:text-gray-200 transition duration-300">Register</a>
+                        <a href="{{ url_for('register') }}" class="text-white hover:text-gray-200 transition duration-300 text-lg">Register</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('login') }}" class="text-white hover:text-gray-200 transition duration-300">Login</a>
+                        <a href="{{ url_for('login') }}" class="text-white hover:text-gray-200 transition duration-300 text-lg">Login</a>
                     </li>
                 </ul>
             </nav>
         </div>
     </header>
+    
 
     <!-- Main Content -->
-    <main class="flex-grow flex flex-col items-center justify-center py-12 px-6">
-        <div class="text-center max-w-lg">
-            <h2 class="text-4xl font-bold text-gray-800 mb-6">Manage Your Finances Effortlessly</h2>
-            <p class="text-lg text-gray-600 mb-8">Our Expense Tracker app helps you keep track of your spending, categorize expenses, and visualize your financial data with ease.</p>
-            <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="{{ url_for('register') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 text-lg font-semibold">Get Started</a>
-                <a href="{{ url_for('login') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-gray-700 transition duration-300 text-lg font-semibold">Login</a>
+    <main class="flex-grow flex flex-col md:flex-row items-center justify-center py-12 px-6">
+        <!-- Image on the Left -->
+        <div class="w-full md:w-1/2 flex justify-center mb-6 md:mb-0 animate__animated animate__zoomInDown">
+            <img src="{{ url_for('static', filename='landing-page.png') }}" alt="Expense Tracker" class="object-cover rounded-lg  w-full max-w-md h-auto">
+        </div>
+        
+        <!-- Card on the Right -->
+        <div class="w-full md:w-1/2 flex flex-col items-center">
+            <div class="text-center bg-gray-50 p-8  opacity-80 md:p-10 rounded-lg shadow-lg max-w-lg w-full animate__animated animate__zoomInDown">
+                
+                <!-- Centered Image -->
+                <div class="flex justify-center mb-6">
+                    <img src="{{ url_for('static', filename='bannu.png') }}" alt="Owner" class="w-40 h-40 object-cover rounded-full">
+                </div>
+                
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">Manage Your Finances Effortlessly</h2>
+                <p class="text-base md:text-lg text-gray-600 mb-6">Our Expense Tracker app helps you keep track of your spending, categorize expenses, and visualize your financial data with ease.</p>
+                <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-6 animate__animated animate__zoomInDown animate__delay-1s">
+                    <a href="{{ url_for('register') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 hover:scale-105 transition-transform duration-300 text-base md:text-lg font-semibold">Get Started</a>
+                    <a href="{{ url_for('login') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 hover:scale-105 transition-transform duration-300 text-base md:text-lg font-semibold">Login</a>
+                </div>
             </div>
         </div>
+        
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-4 mt-auto">
         <div class="container mx-auto text-center">
-            <p class="text-sm">&copy; 2024 Expense Tracker. All rights reserved. Developed by Durga Prasad Kakileti.</p>
+            <marquee scrollamount="20"><p class="text-sm">&copy; 2024 Expense Tracker. All rights reserved. Developed by Durga Prasad Kakileti.</p></marquee>
         </div>
     </footer>
-    
 </body>
 </html>
